@@ -24,7 +24,8 @@ export default function () {
         reportTestDone (name, testRunInfo) {
             const end = new Date(+this.startTime + testRunInfo.durationMs);
             const hasErr = !!testRunInfo.errs.length;
-            let result = hasErr ? `Failed` : `Passed`;
+
+            let result = hasErr ? 'Failed' : 'Passed';
 
             result = testRunInfo.skipped ? 'Skipped' : result;
             const testResults = {};
@@ -64,6 +65,7 @@ export default function () {
                     methodClassName: 'none'
                 });
                 const errorMessage    = test.errs ? `${test.name} encountered errors` : '';
+
                 let errorStacktrace = '';
 
                 if (test.errs) {
@@ -92,7 +94,7 @@ export default function () {
 
 function formatDuration (milliseconds) {
     // we get duration ISO string
-    var duration = (new Date(milliseconds)).toISOString();
+    const duration = (new Date(milliseconds)).toISOString();
 
     // we return time part only and remove Z char
     return duration.substring(duration.indexOf('T') + 1).replace('Z', '');

@@ -4,11 +4,11 @@ var babel   = require('gulp-babel');
 var mocha   = require('gulp-mocha');
 var del     = require('del');
 
-gulp.task('clean', function (cb) {
+gulp.task('clean', async function (cb) {
     del('lib', cb);
 });
 
-gulp.task('lint', function () {
+gulp.task('lint', async function () {
     return gulp
         .src([
             'src/**/*.js',
@@ -20,14 +20,14 @@ gulp.task('lint', function () {
         .pipe(eslint.failAfterError());
 });
 
-gulp.task('build', ['clean', 'lint'], function () {
+gulp.task('build', gulp.series('clean', 'lint'), async function () {
     return gulp
         .src('src/**/*.js')
         .pipe(babel())
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('test', ['build'], function () {
+gulp.task('test', gulp.series('build'), async function () {
     return gulp
         .src('test/**.js')
         .pipe(mocha({
@@ -37,7 +37,7 @@ gulp.task('test', ['build'], function () {
         }));
 });
 
-gulp.task('preview', ['build'], function () {
+gulp.task('preview', gulp.series('build', async function () {
     var buildReporterPlugin = require('testcafe').embeddingUtils.buildReporterPlugin;
     var pluginFactory       = require('./lib');
     var reporterTestCalls   = require('./test/utils/reporter-test-calls');
@@ -50,4 +50,4 @@ gulp.task('preview', ['build'], function () {
     });
 
     process.exit(0);
-});
+}));
