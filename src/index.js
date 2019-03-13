@@ -84,11 +84,11 @@ export default function () {
                         errorStacktrace += this.formatError(err, prefix) + newLine;
 
                         if (err.screenshotPath) {
-                            // test.screenshots.forEach((screenshot) => {
-                            //     resultFiles.push({ path: screenshot.screenshotPath });
-                            // });
-                            //todo need to trim from IN\\
-                            resultFiles.push({ path: err.screenshotPath });
+                            //trim to errors\filename
+                            var relativePath = err.screenshotPath.split('\\').slice(-2).join('\\');
+
+                            //resultFiles.push({ path: err.screenshotPath });
+                            resultFiles.push({ path: relativePath });
                         }
 
                     });
@@ -106,7 +106,7 @@ export default function () {
                     endTime:         test.end && test.end.toISOString() || '',
                     errorMessage:    errorMessage,
                     errorStacktrace: errorStacktrace,
-                    executionId:     test.testId,
+                    executionId:     test.testId, //aparently must be a guid so can't use test-num 
                     resultFiles:     resultFiles
                 });
             });
