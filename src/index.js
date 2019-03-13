@@ -11,6 +11,8 @@ export default function () {
     return {
         noColors: true,
         
+        currentTestNumber: 1,
+        
         reportTaskStart (startTime/*, userAgents, testCount*/) {
             this.startTime = startTime;
             this.tests = [];
@@ -37,6 +39,11 @@ export default function () {
             testResults.duration = testRunInfo.durationMs;
             testResults.start = this.testStartTime;
             testResults.end = end;
+            testResults.testIndex = this.currentTestNumber;
+            testResults.testId = 'TEST-' + testResults.testIndex;
+            
+            this.currentTestNumber += 1;
+            
             this.tests.push(testResults);
         },
 
@@ -76,6 +83,20 @@ export default function () {
                     });
                 }
 
+                const resultFiles = [];
+
+                console.log('screenshots');
+                console.log(test);
+                console.log(test.screenshots);
+
+                if (test.screenshotPath) {
+                    // test.screenshots.forEach((screenshot) => {
+                    //     resultFiles.push({ path: screenshot.screenshotPath });
+                    // });
+                    //todo need to trim from IN\\
+                    resultFiles.push({ path: test.screenshotPath });
+                }
+
                 run.addResult({
                     test:            unittest,
                     computerName:    computerName,
@@ -84,7 +105,9 @@ export default function () {
                     startTime:       test.start && test.start.toISOString() || '',
                     endTime:         test.end && test.end.toISOString() || '',
                     errorMessage:    errorMessage,
-                    errorStacktrace: errorStacktrace
+                    errorStacktrace: errorStacktrace,
+                    executionId:     test.testId,
+                    resultFiles:     resultFiles
                 });
             });
             this.write(run.toXml());
