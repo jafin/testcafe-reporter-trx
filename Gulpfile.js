@@ -4,11 +4,16 @@ var babel   = require('gulp-babel');
 var mocha   = require('gulp-mocha');
 var del     = require('del');
 
-gulp.task('clean', async function (cb) {
-    del('lib', cb);
+// Build directories
+const dirs = {
+    dest: './lib/'
+};
+
+gulp.task('clean', ()=> {
+    return del([`${dirs.dest}*.*`]); //without *.* might get EPERM error on windows.
 });
 
-gulp.task('lint', async function () {
+gulp.task('lint', ()=> {
     return gulp
         .src([
             'src/**/*.js',
@@ -20,14 +25,19 @@ gulp.task('lint', async function () {
         .pipe(eslint.failAfterError());
 });
 
-gulp.task('build', gulp.series('clean', 'lint'), async function () {
+gulp.task('build', gulp.series('clean', 'lint', ()=> {
     return gulp
         .src('src/**/*.js')
-        .pipe(babel())
-        .pipe(gulp.dest('lib'));
-});
+        .pipe(babel({
+            presets: ['@babel/env'],
+            plugins: [
+                'add-module-exports'
+            ]
+        }))
+        .pipe(gulp.dest(dirs.dest));
+}));
 
-gulp.task('test', gulp.series('build'), async function () {
+gulp.task('test', gulp.series('build', ()=> {
     return gulp
         .src('test/**.js')
         .pipe(mocha({
@@ -35,7 +45,7 @@ gulp.task('test', gulp.series('build'), async function () {
             reporter: 'spec',
             timeout:  typeof v8debug === 'undefined' ? 2000 : Infinity // NOTE: disable timeouts in debug
         }));
-});
+}));
 
 gulp.task('preview', gulp.series('build', async function () {
     var buildReporterPlugin = require('testcafe').embeddingUtils.buildReporterPlugin;
