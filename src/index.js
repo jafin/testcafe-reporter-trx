@@ -74,28 +74,28 @@ export default function () {
                 const errorMessage    = test.errs ? `${test.name} encountered errors` : '';
 
                 let errorStacktrace = '';
+                
+                const resultFiles = [];
 
                 if (test.errs) {
                     test.errs.map((err, idx) => {
                         const prefix = this.chalk.red(`${idx + 1}) `);
 
                         errorStacktrace += this.formatError(err, prefix) + newLine;
+
+                        if (err.screenshotPath) {
+                            // test.screenshots.forEach((screenshot) => {
+                            //     resultFiles.push({ path: screenshot.screenshotPath });
+                            // });
+                            //todo need to trim from IN\\
+                            resultFiles.push({ path: err.screenshotPath });
+                        }
+
                     });
                 }
 
-                const resultFiles = [];
-
-                console.log('screenshots');
                 console.log(test);
-                console.log(test.screenshots);
-
-                if (test.screenshotPath) {
-                    // test.screenshots.forEach((screenshot) => {
-                    //     resultFiles.push({ path: screenshot.screenshotPath });
-                    // });
-                    //todo need to trim from IN\\
-                    resultFiles.push({ path: test.screenshotPath });
-                }
+                console.log('resultfiles:', resultFiles);
 
                 run.addResult({
                     test:            unittest,
